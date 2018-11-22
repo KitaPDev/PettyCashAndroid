@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ContraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/tb_home"
+            layout="@layout/toolbar" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ProgressBar
+        android:id="@+id/prgBarHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
+
+    <include layout="@layout/content_transactions" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_newTransaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_add_white_24dp"
+        android:backgroundTint="@color/colorPrimary" />
+
+</android.support.design.widget.CoordinatorLayout>
