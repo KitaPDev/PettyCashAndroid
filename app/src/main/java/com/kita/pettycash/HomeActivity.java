@@ -1,10 +1,12 @@
 package com.kita.pettycash;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,22 +14,22 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.kita.androidlib.client.AsyncRetrieveList;
-import com.kita.androidlib.client.AsyncRetrieveObject;
 import com.kita.pettycash.client.interfaces.AsyncResponse;
 import com.kitap.lib.bean.BEANPettyCashTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class HomeActivity extends AppCompatActivity implements AsyncResponse {
 
@@ -39,10 +41,19 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
     private String m_strUsername = null;
     private Context m_context = this;
 
-    private MyAdapter m_adapter;
+    private HomeAdapter m_adapter;
     private RecyclerView m_recyclerView;
 
     private List<BEANPettyCashTransaction> m_lsBEANPettyCashTransactions;
+
+    Toolbar m_tbHome;
+    FloatingActionButton m_fab;
+    boolean isInSelection;
+    TextView txtCounter;
+
+    List<BEANPettyCashTransaction> m_lsSelected = new ArrayList<>();
+
+    int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,17 +75,17 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
             finish();
 
         } else {
-            Toolbar toolbarHome = findViewById(R.id.tb_home);
-            toolbarHome.setTitle("");
-            setSupportActionBar(toolbarHome);
+            m_tbHome = findViewById(R.id.tb_home);
+            m_tbHome.setTitle("");
+            setSupportActionBar(m_tbHome);
 
-            toolbarHome.setTitle(m_strUsername.toUpperCase());
+            m_tbHome.setTitle(m_strUsername.toUpperCase());
 
-            android.support.v7.widget.SearchView searchView = findViewById(R.id.mySearchView);
+            SearchView searchView = findViewById(R.id.mySearchView);
 
             try {
 
-                m_adapter = new MyAdapter(this, getPettyCashTransactions());
+                m_adapter = new HomeAdapter(this, getPettyCashTransactions());
 
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
@@ -87,7 +98,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
 
             m_recyclerView.setAdapter(m_adapter);
 
-            searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     return false;
@@ -100,8 +111,8 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
                 }
             });
 
-            FloatingActionButton fab = findViewById(R.id.fab_newTransaction);
-            fab.setOnClickListener(new View.OnClickListener() {
+            m_fab = findViewById(R.id.fab_newTransaction);
+            m_fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(m_context, NewPettyCashTransactionActivity.class);
@@ -118,12 +129,25 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
         return true;
     }
 
+    @SuppressLint("RestrictedApi")
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
 
             case R.id.action_select:
 
-                //todo prime
+                m_tbHome.getMenu().clear();
+
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) m_fab.getLayoutParams();
+                params.setAnchorId(View.NO_ID);
+
+                m_fab.setLayoutParams(params);
+                m_fab.setVisibility(View.GONE);
+                m_tbHome.inflateMenu(R.menu.menu_selection);
+
+                txtCounter.setVisibility(View.VISIBLE);
+                isInSelection = true;
+                m_adapter.notifyDataSetChanged();
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
                 return true;
 
@@ -162,6 +186,16 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
 
                 return true;
 
+            case R.id.action_delete:
+                m_adapter.updateAdapter(m_lsSelected);
+                clearActionMode();
+
+                return true;
+
+            case R.id.home:
+                clearActionMode();
+                m_adapter.notifyDataSetChanged();
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -179,6 +213,59 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
         ((AsyncRetrieveList) asyncGetPettyCashTransactions).setProgressbar(prgBar);
 
         return asyncGetPettyCashTransactions.execute().get();
+    }
+
+    public void prepareSelection(View view, int position) {
+        if (((CheckBox) view).isChecked()) {
+            m_lsSelected.add(m_lsBEANPettyCashTransactions.get(position));
+            counter++;
+            updateCounter(counter);
+
+        } else {
+            m_lsSelected.remove(m_lsBEANPettyCashTransactions.get(position));
+            counter--;
+            updateCounter(counter);
+
+        }
+    }
+
+    public void updateCounter(int counter) {
+        if (counter == 0 || counter == 1){
+            txtCounter.setText(counter + " item selected");
+        }
+        else {
+            txtCounter.setText(counter + " items selected");
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    public void clearActionMode(){
+        isInSelection=false;
+
+        m_tbHome.getMenu().clear();
+        m_tbHome.inflateMenu(R.menu.menu_home);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
+        txtCounter.setVisibility(View.GONE);
+        CoordinatorLayout.LayoutParams param = (CoordinatorLayout.LayoutParams) m_fab.getLayoutParams();
+        param.setAnchorId(View.NO_ID);
+        m_fab.setLayoutParams(param);
+        m_fab.setVisibility(View.VISIBLE );
+
+        counter = 0;
+        txtCounter.setText(counter + " item selected");
+        m_lsSelected.clear();
+    }
+
+    public void onBackPressed() {
+        if (isInSelection) {
+            clearActionMode();
+            m_adapter.notifyDataSetChanged();
+
+        } else {
+            super.onBackPressed();
+
+        }
     }
 
     @Override

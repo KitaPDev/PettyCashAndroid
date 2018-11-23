@@ -19,4 +19,5 @@
     <string name="save">Save</string>
     <string name="amount">Amount</string>
     <string name="note">Note</string>
+    <string name="delete">Delete</string>
 </resources>

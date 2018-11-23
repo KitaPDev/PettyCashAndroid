@@ -9,10 +9,10 @@ import java.util.List;
 
 public class CustomFilter extends Filter {
 
-    MyAdapter m_adapter;
+    HomeAdapter m_adapter;
     List<BEANPettyCashTransaction> m_lsFilter;
 
-    public CustomFilter(List<BEANPettyCashTransaction> p_lsFilter, MyAdapter p_adapter) {
+    public CustomFilter(List<BEANPettyCashTransaction> p_lsFilter, HomeAdapter p_adapter) {
         m_adapter = p_adapter;
         m_lsFilter = p_lsFilter;
     }

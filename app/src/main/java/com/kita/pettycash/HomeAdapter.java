@@ -15,46 +15,67 @@ import com.kitap.lib.bean.BEANPettyCashTransaction;
 
 import java.util.List;
 
-public class MyAdapter extends RecyclerView.Adapter<PettyCashTransactionHolder> implements Filterable {
+public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Filterable {
 
     Context m_context;
     List<BEANPettyCashTransaction> m_lsBEANPettyCashTransactions, m_lsFilter;
     CustomFilter filter;
 
-    public MyAdapter(Context p_context, List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
+    HomeActivity homeActivity;
+
+    public HomeAdapter(Context p_context, List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
         m_context = p_context;
         m_lsBEANPettyCashTransactions = p_lsBEANPettyCashTransactions;
         m_lsFilter = p_lsBEANPettyCashTransactions;
+
+        homeActivity = (HomeActivity) p_context;
+    }
+
+    public void updateAdapter(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
+        for (BEANPettyCashTransaction beanPettyCashTransaction : p_lsBEANPettyCashTransactions){
+            m_lsBEANPettyCashTransactions.remove(beanPettyCashTransaction);
+
+        }
+
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public PettyCashTransactionHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public HomeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.model, null);
 
-        PettyCashTransactionHolder holder = new PettyCashTransactionHolder(view);
+        HomeHolder holder = new HomeHolder(view);
 
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final PettyCashTransactionHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final HomeHolder holder, int position) {
 
         SharedPreferences sharedPreferences = m_context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "");
 
         if(m_lsBEANPettyCashTransactions.get(position).getUsernamePayer().equals(username)) {
-            holder.m_txt_otherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayer());
-            holder.m_txt_userType.setText(m_context.getString(R.string.payer));
+            holder.m_txtOtherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayer());
+            holder.m_txtUserType.setText(m_context.getString(R.string.payer));
 
         } else if (m_lsBEANPettyCashTransactions.get(position).getUsernamePayee().equals(username)) {
-            holder.m_txt_otherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayee());
-            holder.m_txt_userType.setText(m_context.getString(R.string.payee));
+            holder.m_txtOtherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayee());
+            holder.m_txtUserType.setText(m_context.getString(R.string.payee));
 
         }
 
-        holder.m_txt_openingBalance.setText(String.valueOf(m_lsBEANPettyCashTransactions.get(position).getAmount()));
-        holder.m_txt_note.setText(m_lsBEANPettyCashTransactions.get(position).getNote());
+        if(!homeActivity.isInSelection) {
+            holder.m_chkSelect.setVisibility(View.GONE);
+
+        } else {
+            holder.m_chkSelect.setVisibility(View.VISIBLE);
+            holder.m_chkSelect.setChecked(false);
+        }
+
+        holder.m_txtOpeningBalance.setText(String.valueOf(m_lsBEANPettyCashTransactions.get(position).getAmount()));
+        holder.m_txtNote.setText(m_lsBEANPettyCashTransactions.get(position).getNote());
 
         holder.setItemClickListener(new ItemClickListener() {
             @Override
