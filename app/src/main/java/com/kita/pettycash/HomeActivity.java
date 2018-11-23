@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static java.security.AccessController.getContext;
+
 public class HomeActivity extends AppCompatActivity implements AsyncResponse {
 
     private static String HOST = "10.0.2.2";
@@ -44,7 +47,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
     private HomeAdapter m_adapter;
     private RecyclerView m_recyclerView;
 
-    private List<BEANPettyCashTransaction> m_lsBEANPettyCashTransactions;
+    private List<BEANPettyCashTransaction> m_lsBEANPettyCashTransactions = new ArrayList<>();
 
     Toolbar m_tbHome;
     FloatingActionButton m_fab;
@@ -62,9 +65,10 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
 
         prgBar = findViewById(R.id.prgBarHome);
 
-        m_context = this;
-
         txtCounter = findViewById(R.id.txt_counter);
+        txtCounter.setVisibility(View.GONE);
+
+        m_context = this;
 
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "");

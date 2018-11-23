@@ -34,4 +34,6 @@
         android:src="@drawable/ic_add_white_24dp"
         android:backgroundTint="@color/colorPrimary" />
 
+    <include layout="@layout/toolbar_selection" />
+
 </android.support.design.widget.CoordinatorLayout>
