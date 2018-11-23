@@ -64,6 +64,8 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
 
         m_context = this;
 
+        txtCounter = findViewById(R.id.txt_counter);
+
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "");
 
