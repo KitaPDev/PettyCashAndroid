@@ -1,5 +1,6 @@
 package com.kita.pettycash;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -14,12 +15,16 @@ public class HomeHolder extends RecyclerView.ViewHolder implements View.OnClickL
     TextView m_txtNote;
     CheckBox m_chkSelect;
 
-    HomeActivity homeActivity;
+    Context m_context;
+
+    HomeActivity m_homeActivity;
 
     ItemClickListener m_itemClickListener;
 
-    public HomeHolder(@NonNull View itemView) {
+    public HomeHolder(@NonNull View itemView, Context p_context) {
         super(itemView);
+
+        m_context = p_context;
 
         m_txtUserType = itemView.findViewById(R.id.txt_userType);
         m_txtOtherUsername = itemView.findViewById(R.id.txt_otherUsername);
@@ -34,11 +39,14 @@ public class HomeHolder extends RecyclerView.ViewHolder implements View.OnClickL
     @Override
     public void onClick(View v) {
         m_itemClickListener.onItemClick(v, getLayoutPosition());
-        homeActivity.prepareSelection(v, getAdapterPosition());
+
+        m_homeActivity = (HomeActivity) m_context;
+        m_homeActivity.prepareSelection(v, getAdapterPosition());
 
     }
 
     public void setItemClickListener(ItemClickListener ic) {
         m_itemClickListener = ic;
     }
+
 }

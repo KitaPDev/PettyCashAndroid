@@ -23,11 +23,13 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ChangePasswordActivity" />
-        <activity android:name=".NewPettyCashTransactionActivity" >
+        <activity android:name=".NewPettyCashTransactionActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".HomeActivity" />
         </activity>
+        <activity android:name=".PayerTransactionActivity" />
+        <activity android:name=".PayeeTransactionActivity"></activity>
     </application>
 
 </manifest>

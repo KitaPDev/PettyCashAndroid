@@ -16,12 +16,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.kita.androidlib.client.AsyncRetrieveObject;
 import com.kita.lib.rpc.BEANRemoteExecution;
 import com.kita.pettycash.client.interfaces.AsyncResponse;
 import com.kitap.lib.bean.BEANPettyCashTransaction;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.net.Socket;
@@ -46,14 +46,18 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
     private String m_strPayeeUsername = null;
     private BigDecimal m_bdAmount = null;
 
+    Context m_context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_pettycash_transaction);
 
+        m_context = this;
+
         m_edtPayee = findViewById(R.id.edt_PayeeUsername);
         m_edtAmount = findViewById(R.id.edt_Amount);
-        m_edtNote = findViewById(R.id.edtNote);
+        m_edtNote = findViewById(R.id.edt_Note);
         prgBar = findViewById(R.id.prgBarNewTransaction);
 
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -92,6 +96,8 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
+                                NewPettyCashTransactionActivity newPettyCashTransactionActivity = (NewPettyCashTransactionActivity) m_context;
+                                NavUtils.navigateUpFromSameTask(newPettyCashTransactionActivity);
                             }
                         });
 
@@ -104,7 +110,6 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
                         });
 
                 dlgAlert.create().show();
-                NavUtils.navigateUpFromSameTask(this);
                 return true;
 
             case R.id.action_save:
@@ -133,9 +138,12 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
                     List<String> lsUsername = new ArrayList<>();
                     lsUsername.add(m_strPayeeUsername);
 
-                    AsyncTask<Void, Void, Object> asyncUserExists = new AsyncUserExists("User",
-                            "isExistingUser", lsUsername);
-                    ((AsyncUserExists) asyncUserExists).delegate = this;
+                    AsyncTask<Void, Void, Object> asyncUserExists = new AsyncRetrieveObject(HOST, PORT, this,
+                            "User", "isExistingUser", lsUsername);
+
+                    ((AsyncRetrieveObject) asyncUserExists).delegate = this;
+                    ((AsyncRetrieveObject) asyncUserExists).setProgressbar(prgBar);
+
                     asyncUserExists.execute();
 
                 }
@@ -265,73 +273,6 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
                     "PettyCash", "createNewTransaction", lsPettyCash);
             asyncNewPettyCashTransaction.execute();
 
-        }
-    }
-
-    private class AsyncUserExists extends AsyncTask<Void, Void, Object> {
-        public AsyncResponse delegate = null;
-
-        String m_strClassName;
-        String m_strMethodName;
-        List<String> m_lsMethodParameters;
-
-        AsyncUserExists(String p_strClassName, String p_strMethodName, List<String> p_lsMethodParameters) {
-            m_strClassName = p_strClassName;
-            m_strMethodName = p_strMethodName;
-            m_lsMethodParameters = p_lsMethodParameters;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            prgBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Object doInBackground(Void... voids) {
-            Object objResult = null;
-
-            try {
-                BEANRemoteExecution remoteExecution = new BEANRemoteExecution(m_strClassName,
-                        m_strMethodName, m_lsMethodParameters);
-
-                Socket clientSocket = new Socket(HOST, PORT);
-
-                ObjectOutputStream clientOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                clientOutputStream.writeObject(remoteExecution);
-                clientOutputStream.flush();
-
-                ObjectInputStream clientInputStream = new ObjectInputStream(clientSocket.getInputStream());
-                objResult = clientInputStream.readObject();
-
-                clientOutputStream.close();
-                clientInputStream.close();
-                clientSocket.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(NewPettyCashTransactionActivity.this, "Error, please try again.", Toast.LENGTH_SHORT).show();
-
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            return objResult;
-        }
-
-        protected void onPostExecute(Object result) {
-            super.onPostExecute(result);
-
-            prgBar.setVisibility(View.GONE);
-
-            try {
-
-                delegate.processFinish(result);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 

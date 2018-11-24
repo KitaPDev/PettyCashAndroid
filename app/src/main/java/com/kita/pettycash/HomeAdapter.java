@@ -21,14 +21,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
     List<BEANPettyCashTransaction> m_lsBEANPettyCashTransactions, m_lsFilter;
     CustomFilter filter;
 
-    HomeActivity homeActivity;
+    HomeActivity m_homeActivity;
 
     public HomeAdapter(Context p_context, List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
         m_context = p_context;
         m_lsBEANPettyCashTransactions = p_lsBEANPettyCashTransactions;
         m_lsFilter = p_lsBEANPettyCashTransactions;
 
-        homeActivity = (HomeActivity) p_context;
+        m_homeActivity = (HomeActivity) p_context;
     }
 
     public void updateAdapter(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
@@ -45,7 +45,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
     public HomeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.model, null);
 
-        HomeHolder holder = new HomeHolder(view);
+        HomeHolder holder = new HomeHolder(view, m_context);
 
         return holder;
     }
@@ -57,16 +57,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
         String username = sharedPreferences.getString("username", "");
 
         if(m_lsBEANPettyCashTransactions.get(position).getUsernamePayer().equals(username)) {
-            holder.m_txtOtherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayer());
+            holder.m_txtOtherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayee());
             holder.m_txtUserType.setText(m_context.getString(R.string.payer));
 
         } else if (m_lsBEANPettyCashTransactions.get(position).getUsernamePayee().equals(username)) {
-            holder.m_txtOtherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayee());
+            holder.m_txtOtherUsername.setText(m_lsBEANPettyCashTransactions.get(position).getUsernamePayer());
             holder.m_txtUserType.setText(m_context.getString(R.string.payee));
 
         }
 
-        if(!homeActivity.isInSelection) {
+        if(!m_homeActivity.isInSelection) {
             holder.m_chkSelect.setVisibility(View.GONE);
 
         } else {
@@ -80,17 +80,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
         holder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemClick(View view, int pos) {
-                Toast.makeText(m_context, "Item clicked", Toast.LENGTH_SHORT).show(); //to do
+                 //todo
             }
         });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Toast.makeText(m_context, "Item clicked", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override

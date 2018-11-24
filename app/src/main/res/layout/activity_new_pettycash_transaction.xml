@@ -80,12 +80,12 @@
         android:text="@string/note"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@+id/edtNote"
-        app:layout_constraintEnd_toStartOf="@+id/edtNote"
+        app:layout_constraintBaseline_toBaselineOf="@+id/edt_Note"
+        app:layout_constraintEnd_toStartOf="@+id/edt_Note"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/edtNote"
+        android:id="@+id/edt_Note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
