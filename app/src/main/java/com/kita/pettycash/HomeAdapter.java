@@ -1,6 +1,7 @@
 package com.kita.pettycash;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.Toast;
 
 import com.kitap.lib.bean.BEANPettyCashTransaction;
 
@@ -31,19 +31,18 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
         m_homeActivity = (HomeActivity) p_context;
     }
 
-    public void updateAdapter(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
+    public void deleteFromDataSet(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
         for (BEANPettyCashTransaction beanPettyCashTransaction : p_lsBEANPettyCashTransactions){
             m_lsBEANPettyCashTransactions.remove(beanPettyCashTransaction);
 
         }
-
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public HomeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.model, null);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.home_model, null);
 
         HomeHolder holder = new HomeHolder(view, m_context);
 
@@ -80,14 +79,24 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
         holder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemClick(View view, int pos) {
-                 //todo
+
             }
         });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(m_context, "Item clicked", Toast.LENGTH_SHORT).show();
+                String strUserType = holder.m_txtUserType.getText().toString();
+                Intent intent = null;
+
+                if(strUserType.equals("Payer")) {
+                    intent = new Intent(m_context, PayerTransactionActivity.class);
+
+                } else if(strUserType.equals("Payee")) {
+                    intent = new Intent(m_context, PayeeTransactionActivity.class);
+
+                }
+                m_context.startActivity(intent);
             }
         });
     }

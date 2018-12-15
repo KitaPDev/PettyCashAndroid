@@ -20,4 +20,6 @@
     <string name="amount">Amount</string>
     <string name="note">Note</string>
     <string name="delete">Delete</string>
+    <string name="rtn">return</string>
+    <string name="received">received</string>
 </resources>

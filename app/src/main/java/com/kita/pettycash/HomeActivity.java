@@ -37,6 +37,8 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
     private static String HOST = "10.0.2.2";
     private static int PORT = 45678;
 
+    private static final int NEW_TRANSACTION_REQUEST = 123;
+
     private ProgressBar prgBar;
 
     private String m_strUsername = null;
@@ -118,8 +120,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(m_context, NewPettyCashTransactionActivity.class);
-                    startActivity(intent);
-                    m_adapter.notifyDataSetChanged();
+                    startActivityForResult(intent, NEW_TRANSACTION_REQUEST);
                 }
             });
         }
@@ -239,7 +240,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
                                     lsBEANPettyCashTransaction.clear();
                                 }
 
-                                m_adapter.updateAdapter(m_lsSelected);
+                                m_adapter.deleteFromDataSet(m_lsSelected);
                                 clearActionMode();
                                 m_tbHome.setTitle(m_strUsername.toUpperCase());
                             }
@@ -288,7 +289,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
             updateCounter(counter);
 
         } else {
-            if(counter > 0) {
+            if (counter > 0) {
                 m_lsSelected.remove(m_lsBEANPettyCashTransactions.get(position));
                 counter--;
                 updateCounter(counter);
@@ -342,6 +343,15 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse {
         } else {
             super.onBackPressed();
 
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == NEW_TRANSACTION_REQUEST) {
+
+            if (resultCode == RESULT_OK) {
+                m_adapter.notifyDataSetChanged();
+            }
         }
     }
 

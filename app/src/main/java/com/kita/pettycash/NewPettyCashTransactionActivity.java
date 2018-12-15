@@ -1,7 +1,9 @@
 package com.kita.pettycash;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +31,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import javax.xml.transform.Result;
 
 
 public class NewPettyCashTransactionActivity extends AppCompatActivity implements AsyncResponse {
@@ -182,7 +186,7 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
         dlgAlert.create().show();
     }
 
-    private class AsyncNewPettyCashTransaction extends AsyncTask<Void, Void, Void> {
+    private class AsyncNewPettyCashTransaction extends AsyncTask<Void, Void, List<BEANPettyCashTransaction>> {
         public AsyncResponse delegate = null;
 
         String m_strClassName;
@@ -203,7 +207,7 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected List<BEANPettyCashTransaction> doInBackground(Void... voids) {
             try {
                 BEANRemoteExecution remoteExecution = new BEANRemoteExecution(m_strClassName,
                         m_strMethodName, m_lsMethodParameters);
@@ -223,15 +227,21 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
 
             }
 
-            return null;
+            return m_lsMethodParameters;
         }
 
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(List<BEANPettyCashTransaction> result) {
             super.onPostExecute(result);
-
             prgBar.setVisibility(View.GONE);
+            try {
+                delegate.processFinish(result);
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             finish();
+            NewPettyCashTransactionActivity newPettyCashTransactionActivity = (NewPettyCashTransactionActivity) m_context;
+            NavUtils.navigateUpFromSameTask(newPettyCashTransactionActivity);
         }
     }
 
@@ -269,15 +279,19 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
             List<BEANPettyCashTransaction> lsPettyCash = new ArrayList<>();
             lsPettyCash.add(beanPettyCashTransaction);
 
-            AsyncTask<Void, Void, Void> asyncNewPettyCashTransaction = new AsyncNewPettyCashTransaction(
-                    "PettyCash", "createNewTransaction", lsPettyCash);
+            AsyncTask<Void, Void, List<BEANPettyCashTransaction>> asyncNewPettyCashTransaction =
+                    new AsyncNewPettyCashTransaction("PettyCash",
+                            "createNewTransaction", lsPettyCash);
             asyncNewPettyCashTransaction.execute();
 
         }
     }
 
     @Override
-    public void processFinish(List<BEANPettyCashTransaction> lsBEANPettyCashTransaction) throws Exception {
+    public void processFinish(List<BEANPettyCashTransaction> lsBEANPettyCashTransaction) {
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra("BEANPettyCashTransaction", lsBEANPettyCashTransaction.get(0));
+        setResult(Activity.RESULT_OK, intent);
 
     }
 

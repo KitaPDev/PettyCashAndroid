@@ -23,7 +23,7 @@
         android:layout_gravity="center"
         android:visibility="invisible" />
 
-    <include layout="@layout/content_transactions" />
+    <include layout="@layout/home_transactions" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_newTransaction"
