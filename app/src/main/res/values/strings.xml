@@ -22,4 +22,12 @@
     <string name="delete">Delete</string>
     <string name="rtn">return</string>
     <string name="received">received</string>
+    <string name="no_usages_yet">No Usages Yet</string>
+    <string name="pending">pending</string>
+    <string name="returned">returned</string>
+    <string name="enter_usage">Enter Usage</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">Search</string>
 </resources>

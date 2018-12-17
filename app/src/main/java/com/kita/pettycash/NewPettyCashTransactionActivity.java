@@ -267,6 +267,8 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
             Date sqlDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
             String strNote = m_edtNote.getText().toString();
 
+            strNote = strNote.replace("'", "''");
+
             BEANPettyCashTransaction beanPettyCashTransaction = new BEANPettyCashTransaction();
             beanPettyCashTransaction.setDatePosting(sqlDate);
             beanPettyCashTransaction.setAmount(m_bdAmount);

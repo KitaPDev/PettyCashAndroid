@@ -49,12 +49,23 @@
             android:padding="10dp"
             android:layout_below="@+id/txt_userType" />
 
+        <TextView
+            android:id="@+id/txt_homeStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_openingBalance"
+            android:layout_toStartOf="@+id/chk_item"
+            android:layout_alignParentEnd="true"
+            android:padding="9dp"
+            android:textSize="18dp" />
+
         <CheckBox
             android:id="@+id/chk_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/txt_openingBalance"
+            android:layout_marginTop="5dp"
             android:checked="false" />
 
     </RelativeLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ContraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,6 +15,19 @@
             android:id="@+id/tb_home"
             layout="@layout/toolbar" />
 
+        <android.support.design.widget.TabLayout
+            android:id="@+id/homeTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?actionBarSize"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="#FFFFFF"
+            app:tabBackground="@color/colorPrimary"
+            app:tabMode="fixed" >
+
+
+        </android.support.design.widget.TabLayout>
+
     </android.support.design.widget.AppBarLayout>
 
     <ProgressBar
@@ -23,7 +37,32 @@
         android:layout_gravity="center"
         android:visibility="invisible" />
 
-    <include layout="@layout/home_transactions" />
+    <!--<include layout="@layout/pettycash_transactions" />-->
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingBottom="16dp"-->
+        <!--android:paddingLeft="16dp"-->
+        <!--android:paddingRight="16dp"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+        <!--tools:context=".HomeActivity"-->
+        <!--tools:showIn="@layout/activity_home" >-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:orientation="vertical"-->
+            <!--android:layout_height="wrap_content" >-->
+
+            <!--<android.support.v7.widget.SearchView-->
+                <!--android:id="@+id/mySearchView"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="50dp"-->
+                <!--app:defaultQueryHint="Search.." />-->
+
+        <!--</LinearLayout>-->
+
+    <!--</RelativeLayout>-->
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_newTransaction"
@@ -33,6 +72,14 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add_white_24dp"
         android:backgroundTint="@color/colorPrimary" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/homeViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp">
+
+    </android.support.v4.view.ViewPager>
 
     <include layout="@layout/toolbar_selection" />
 

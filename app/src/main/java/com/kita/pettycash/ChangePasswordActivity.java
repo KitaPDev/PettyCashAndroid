@@ -133,8 +133,9 @@ public class ChangePasswordActivity extends AppCompatActivity implements AsyncRe
             lsUser.add(m_strUsername);
             lsUser.add(m_strChangePassword);
 
-            AsyncTask<Void, Void, Void> asyncExecuteMethod = new AsyncExecuteMethod(prgBar, HOST,
-                    PORT, "User", "ChangePassword", lsUser);
+            AsyncTask<Void, Void, Void> asyncExecuteMethod = new AsyncExecuteMethod(HOST, PORT,
+                    "User", "ChangePassword", lsUser);
+            ((AsyncExecuteMethod) asyncExecuteMethod).setProgressbar(prgBar);
             asyncExecuteMethod.execute();
 
             startActivity(intent);

@@ -7,12 +7,15 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 public class HomeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     TextView m_txtUserType;
     TextView m_txtOtherUsername;
     TextView m_txtOpeningBalance;
     TextView m_txtNote;
+    TextView m_txtStatus;
     CheckBox m_chkSelect;
 
     Context m_context;
@@ -30,6 +33,7 @@ public class HomeHolder extends RecyclerView.ViewHolder implements View.OnClickL
         m_txtOtherUsername = itemView.findViewById(R.id.txt_otherUsername);
         m_txtOpeningBalance = itemView.findViewById(R.id.txt_openingBalance);
         m_txtNote = itemView.findViewById(R.id.txt_note);
+        m_txtStatus = itemView.findViewById(R.id.txt_homeStatus);
         m_chkSelect = itemView.findViewById(R.id.chk_item);
         m_chkSelect.setOnClickListener(this);
 

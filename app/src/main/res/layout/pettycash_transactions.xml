@@ -7,18 +7,23 @@
     android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="16dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".PayeeTransactionActivity"
-    tools:showIn="@layout/activity_payee_transaction">
+    tools:context=".HomeActivity"
+    tools:showIn="@layout/activity_home">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="match_parent">
 
+        <android.support.v7.widget.SearchView
+            android:id="@+id/mySearchView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:defaultQueryHint="Search.." />
+
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerViewPayeeUsage"
+            android:id="@+id/myRecyclerView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             class="android.support.v7.widget.RecyclerView" />

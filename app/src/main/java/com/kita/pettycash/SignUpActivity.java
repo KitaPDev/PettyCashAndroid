@@ -149,8 +149,9 @@ public class SignUpActivity extends AppCompatActivity implements AsyncResponse {
             lsUser.add(m_strNewUsername);
             lsUser.add(m_strNewPassword);
 
-            AsyncTask<Void, Void, Void> asyncExecuteMethod = new AsyncExecuteMethod(prgBar, HOST,
+            AsyncTask<Void, Void, Void> asyncExecuteMethod = new AsyncExecuteMethod(HOST,
                     PORT, "User", "CreateUser", lsUser);
+            ((AsyncExecuteMethod) asyncExecuteMethod).setProgressbar(prgBar);
             asyncExecuteMethod.execute();
 
             startActivity(intent);
