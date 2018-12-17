@@ -238,6 +238,8 @@ public class PettyCashTransactionActivity extends AppCompatActivity implements A
             if(strUserType.equals("Payer")) {
                 m_btnReturn.setVisibility(View.INVISIBLE);
                 m_fab.setVisibility(View.INVISIBLE);
+                m_btnReceived.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                m_btnReceived.setClickable(false);
 
             }
             if(strUserType.equals("Payee")) {

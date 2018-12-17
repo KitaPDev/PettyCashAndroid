@@ -17,13 +17,15 @@
 
         <android.support.design.widget.TabLayout
             android:id="@+id/homeTabLayout"
+            style="@style/HomeTabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?actionBarSize"
             app:tabGravity="fill"
             app:tabIndicatorColor="#FFFFFF"
             app:tabBackground="@color/colorPrimary"
-            app:tabMode="fixed" >
+            app:tabMode="fixed"
+            android:elevation="0dp" >
 
 
         </android.support.design.widget.TabLayout>

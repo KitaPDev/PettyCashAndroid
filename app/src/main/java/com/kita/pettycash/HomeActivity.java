@@ -23,8 +23,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kita.androidlib.client.AsyncExecuteMethod;
@@ -38,7 +40,7 @@ import java.util.concurrent.ExecutionException;
 
 public class HomeActivity extends AppCompatActivity implements AsyncResponse, SearchView.OnQueryTextListener {
 
-    private static String HOST = "192.168.2.149";
+    private static String HOST = "10.0.2.2";
     private static int PORT = 45678;
 
     private static final int NEW_TRANSACTION_REQUEST = 123;
@@ -179,9 +181,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
     @SuppressLint("RestrictedApi")
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-
             case android.R.id.home:
-
                 counter = 0;
 
                 if (isInSelection) {
@@ -190,26 +190,33 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
                     m_tbHome.setTitle(m_strUsername.toUpperCase());
 
                 }
-
                 return true;
 
             case R.id.action_select:
-
                 m_tbHome.getMenu().clear();
 
                 CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) m_fab.getLayoutParams();
                 params.setAnchorId(View.NO_ID);
 
                 m_fab.setLayoutParams(params);
-                m_fab.setVisibility(View.GONE);
+                m_fab.setVisibility(View.INVISIBLE);
                 m_tbHome.inflateMenu(R.menu.menu_selection);
 
-                txtCounter.setVisibility(View.VISIBLE);
+                txtCounter.setVisibility(View.INVISIBLE);
                 isInSelection = true;
-                m_adapter.notifyDataSetChanged();
+                notifyFragmentAdapter();
+
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
                 getSupportActionBar().setTitle(txtCounter.getText().toString());
+
+                m_tbHome.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        clearActionMode();
+                        notifyFragmentAdapter();
+                    }
+                });
 
                 return true;
 
@@ -218,7 +225,6 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
 
                 dlgAlert.setTitle("Logout");
                 dlgAlert.setMessage("Are you sure you want to log out?");
-                dlgAlert.setPositiveButton("Yes", null);
                 dlgAlert.setCancelable(true);
 
                 dlgAlert.setPositiveButton("Yes",
@@ -260,29 +266,52 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
-                                List<BEANPettyCashTransaction> lsBEANPettyCashTransaction = new ArrayList<>();
-                                for(int i = 0; i < m_lsSelected.size(); i++) {
-                                    lsBEANPettyCashTransaction.add(m_lsSelected.get(i));
-
-                                    AsyncTask<Void, Void, Void> asyncDeleteTransactions = new AsyncExecuteMethod(HOST,
-                                            PORT, "PettyCash", "deletePettyCashTransaction",
-                                            lsBEANPettyCashTransaction);
-                                    ((AsyncExecuteMethod) asyncDeleteTransactions).setProgressbar(prgBar);
-
-                                    try {
-
-                                        asyncDeleteTransactions.execute().get();
-
-                                    } catch (ExecutionException | InterruptedException e) {
-                                        e.printStackTrace();
+                                boolean isPayee = false;
+                                for(BEANPettyCashTransaction beanPettyCashTransaction : m_lsSelected) {
+                                    if(m_strUsername.equals(beanPettyCashTransaction.getUsernamePayee())) {
+                                        isPayee = true;
+                                        break;
                                     }
-                                    lsBEANPettyCashTransaction.clear();
                                 }
 
-                                m_adapter.deleteFromDataSet(m_lsSelected);
-                                clearActionMode();
-                                m_tbHome.setTitle(m_strUsername.toUpperCase());
+                                if(isPayee) {
+                                    AlertDialog.Builder erDlgAlert = new AlertDialog.Builder(m_context);
+
+                                    erDlgAlert.setTitle("Error");
+                                    erDlgAlert.setMessage("Only Payer can delete transactions!");
+
+                                    erDlgAlert.setPositiveButton("OK",
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+
+                                                }
+                                            });
+
+                                    erDlgAlert.create().show();
+
+                                } else {
+                                    List<BEANPettyCashTransaction> lsBEANPettyCashTransaction = new ArrayList<>();
+                                    for(int i = 0; i < m_lsSelected.size(); i++) {
+                                        lsBEANPettyCashTransaction.add(m_lsSelected.get(i));
+
+                                        AsyncTask<Void, Void, Void> asyncDeleteTransactions = new AsyncExecuteMethod(HOST,
+                                                PORT, "PettyCash", "deletePettyCashTransaction",
+                                                lsBEANPettyCashTransaction);
+                                        ((AsyncExecuteMethod) asyncDeleteTransactions).setProgressbar(prgBar);
+
+                                        try {
+                                            asyncDeleteTransactions.execute().get();
+
+                                        } catch (ExecutionException | InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        lsBEANPettyCashTransaction.clear();
+                                    }
+                                    deleteFromFragmentDataSet(m_lsSelected);
+                                    clearActionMode();
+                                    notifyFragmentAdapter();
+                                }
                             }
                         });
 
@@ -290,20 +319,49 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                notifyFragmentAdapter();
+                                clearActionMode();
                             }
                         });
                 dlgAlert.create().show();
+
 
                 return true;
 
             case R.id.home:
                 clearActionMode();
-                m_adapter.notifyDataSetChanged();
+                notifyFragmentAdapter();
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String query) {
+        query = query.toLowerCase();
+
+        List<BEANPettyCashTransaction> searchedList = new ArrayList<>();
+        List<BEANPettyCashTransaction> lsBEANPettyCashTransactions = getFragmentTransactions();
+
+        for (BEANPettyCashTransaction beanPettyCashTransaction : lsBEANPettyCashTransactions){
+            String strUsernamePayee = beanPettyCashTransaction.getUsernamePayee().toLowerCase();
+            String strUsernamePayer = beanPettyCashTransaction.getUsernamePayer().toLowerCase();
+            String strNote = beanPettyCashTransaction.getNote().toLowerCase();
+
+            if (strUsernamePayee.contains(query) || strUsernamePayer.contains(query) || strNote.contains(query)){
+                searchedList.add(beanPettyCashTransaction);
+
+            }
+        }
+        getCurrentAdapter().setFilter(searchedList);
+
+        return true;
     }
 
     public List<BEANPettyCashTransaction> getPettyCashTransactions() throws ExecutionException, InterruptedException {
@@ -322,17 +380,19 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
         return m_lsBEANPettyCashTransactions;
     }
 
-    public List<BEANPettyCashTransaction> getListPettyCashTransactions() { return m_lsBEANPettyCashTransactions; }
+    public List<BEANPettyCashTransaction> getListPettyCashTransactions() throws ExecutionException, InterruptedException { return getPettyCashTransactions(); }
 
     public void prepareSelection(View view, int position) {
+        List<BEANPettyCashTransaction> lsBEANPettyCashTransactions = getFragmentTransactions();
+
         if (((CheckBox) view).isChecked()) {
-            m_lsSelected.add(m_lsBEANPettyCashTransactions.get(position));
+            m_lsSelected.add(lsBEANPettyCashTransactions.get(position));
             counter++;
             updateCounter(counter);
 
         } else {
             if (counter > 0) {
-                m_lsSelected.remove(m_lsBEANPettyCashTransactions.get(position));
+                m_lsSelected.remove(lsBEANPettyCashTransactions.get(position));
                 counter--;
                 updateCounter(counter);
             }
@@ -340,21 +400,21 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
     }
 
     public void updateCounter(final int counter) {
-        final String strCounter;
-        if (counter == 0 || counter == 1) {
-            strCounter = counter + " item selected";
-            txtCounter.setText(strCounter);
-
-        } else {
-            strCounter = counter + " items selected";
-            txtCounter.setText(strCounter);
-        }
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtCounter.setText(strCounter);
-            }
-        });
+//        final String strCounter;
+//        if (counter == 0 || counter == 1) {
+//            strCounter = counter + " item selected";
+//            txtCounter.setText(strCounter);
+//
+//        } else {
+//            strCounter = counter + " items selected";
+//            txtCounter.setText(strCounter);
+//        }
+//        this.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                txtCounter.setText(strCounter);
+//            }
+//        });
     }
 
     @SuppressLint("RestrictedApi")
@@ -363,16 +423,16 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
 
         m_tbHome.getMenu().clear();
         m_tbHome.inflateMenu(R.menu.menu_home);
+        m_tbHome.setTitle(m_strUsername.toUpperCase());
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
         txtCounter.setVisibility(View.INVISIBLE);
+
         CoordinatorLayout.LayoutParams param = (CoordinatorLayout.LayoutParams) m_fab.getLayoutParams();
         param.setAnchorId(View.NO_ID);
         m_fab.setLayoutParams(param);
         m_fab.setVisibility(View.VISIBLE);
 
         counter = 0;
-        txtCounter.setText(counter + " item selected");
         m_lsSelected.clear();
     }
 
@@ -381,7 +441,7 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
 
         if (isInSelection) {
             clearActionMode();
-            m_adapter.notifyDataSetChanged();
+            notifyFragmentAdapter();
             m_tbHome.setTitle(m_strUsername.toUpperCase());
 
         } else {
@@ -405,31 +465,6 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
     @Override
     public void processFinish(Object p_objBEANPettyCashTransactions) {}
 
-    @Override
-    public boolean onQueryTextSubmit(String s) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String query) {
-        query = query.toLowerCase();
-
-        List<BEANPettyCashTransaction> searchedList = new ArrayList<>();
-        for (BEANPettyCashTransaction beanPettyCashTransaction : m_lsBEANPettyCashTransactions){
-            String strUsernamePayee = beanPettyCashTransaction.getUsernamePayee().toLowerCase();
-            String strUsernamePayer = beanPettyCashTransaction.getUsernamePayer().toLowerCase();
-            String strNote = beanPettyCashTransaction.getNote().toLowerCase();
-
-            if (strUsernamePayee.contains(query) || strUsernamePayer.contains(query) || strNote.contains(query)){
-                searchedList.add(beanPettyCashTransaction);
-
-            }
-        }
-        getCurrentAdapter().setFilter(searchedList);
-
-        return true;
-    }
-
     public HomeAdapter getCurrentAdapter() {
         switch(m_viewPager.getCurrentItem()) {
             case 0:
@@ -440,6 +475,65 @@ public class HomeActivity extends AppCompatActivity implements AsyncResponse, Se
                 return m_receivedTransactionsFragment.getAdapter();
             default:
                 return null;
+        }
+    }
+
+    public List<BEANPettyCashTransaction> getFragmentTransactions() {
+        List<BEANPettyCashTransaction> lsBEANPettyCashTransactions = new ArrayList<>();
+        switch(m_viewPager.getCurrentItem()){
+            case 0:
+                try {
+                    lsBEANPettyCashTransactions = m_pendingTransactionsFragment.getPendingTransactions();
+
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 1:
+                try {
+                    lsBEANPettyCashTransactions = m_returnedTransactionsFragment.getReturnedTransactions();
+
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 2:
+                try {
+                    lsBEANPettyCashTransactions = m_receivedTransactionsFragment.getReceivedTransactions();
+
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return lsBEANPettyCashTransactions;
+    }
+
+    public void deleteFromFragmentDataSet(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions) {
+        switch(m_viewPager.getCurrentItem()) {
+            case 0:
+                m_pendingTransactionsFragment.getAdapter().deleteFromDataSet(p_lsBEANPettyCashTransactions);
+                break;
+            case 1:
+                m_returnedTransactionsFragment.getAdapter().deleteFromDataSet(p_lsBEANPettyCashTransactions);
+                break;
+            case 2:
+                m_receivedTransactionsFragment.getAdapter().deleteFromDataSet(p_lsBEANPettyCashTransactions);
+                break;
+        }
+    }
+
+    public void notifyFragmentAdapter() {
+        switch(m_viewPager.getCurrentItem()) {
+            case 0:
+                m_pendingTransactionsFragment.getAdapter().notifyDataSetChanged();
+                break;
+            case 1:
+                m_returnedTransactionsFragment.getAdapter().notifyDataSetChanged();
+                break;
+            case 2:
+                m_receivedTransactionsFragment.getAdapter().notifyDataSetChanged();
+                break;
         }
     }
 }

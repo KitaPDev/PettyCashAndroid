@@ -24,7 +24,12 @@ public class ReturnedTransactionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_returned_transactions, container, false);
 
-        m_adapter = new HomeAdapter(getActivity(), getReturnedTransactions());
+        try {
+            m_adapter = new HomeAdapter(getActivity(), getReturnedTransactions());
+
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
 
         if(getActivity() != null) {
             m_recyclerView = view.findViewById(R.id.recyclerViewReturned);
@@ -37,7 +42,7 @@ public class ReturnedTransactionsFragment extends Fragment {
         return view;
     }
 
-    public List<BEANPettyCashTransaction> getReturnedTransactions() {
+    public List<BEANPettyCashTransaction> getReturnedTransactions() throws ExecutionException, InterruptedException {
         List<BEANPettyCashTransaction> lsReturnedTransactions = new ArrayList<>();
         HomeActivity homeActivity = (HomeActivity) getActivity();
 

@@ -24,7 +24,12 @@ public class PendingTransactionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pending_transactions, container, false);
 
-        m_adapter = new HomeAdapter(getActivity(), getPendingTransactions());
+        try {
+            m_adapter = new HomeAdapter(getActivity(), getPendingTransactions());
+
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
 
         if(getActivity() != null) {
             m_recyclerView = view.findViewById(R.id.recyclerViewPending);
@@ -39,10 +44,9 @@ public class PendingTransactionsFragment extends Fragment {
 
     public void onResume() {
         super.onResume();
-
     }
 
-    public List<BEANPettyCashTransaction> getPendingTransactions() {
+    public List<BEANPettyCashTransaction> getPendingTransactions() throws ExecutionException, InterruptedException {
         List<BEANPettyCashTransaction> lsPendingTransactions = new ArrayList<>();
         HomeActivity homeActivity = (HomeActivity) getActivity();
 

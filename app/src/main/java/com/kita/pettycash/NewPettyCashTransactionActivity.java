@@ -139,19 +139,35 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
                 } else {
                     m_strPayeeUsername = m_edtPayee.getText().toString().toLowerCase();
 
-                    List<String> lsUsername = new ArrayList<>();
-                    lsUsername.add(m_strPayeeUsername);
+                    if(m_strUsername.equals(m_strPayeeUsername)) {
+                        dlgAlert = new AlertDialog.Builder(this);
 
-                    AsyncTask<Void, Void, Object> asyncUserExists = new AsyncRetrieveObject(HOST, PORT, this,
-                            "User", "isExistingUser", lsUsername);
+                        dlgAlert.setTitle("Error!");
+                        dlgAlert.setMessage("Payee cannot be yourself!");
+                        dlgAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-                    ((AsyncRetrieveObject) asyncUserExists).delegate = this;
-                    ((AsyncRetrieveObject) asyncUserExists).setProgressbar(prgBar);
+                            }
+                        });
+                        dlgAlert.setCancelable(true);
 
-                    asyncUserExists.execute();
+                        dlgAlert.create().show();
 
+                    } else {
+                        List<String> lsUsername = new ArrayList<>();
+                        lsUsername.add(m_strPayeeUsername);
+
+                        AsyncTask<Void, Void, Object> asyncUserExists = new AsyncRetrieveObject(HOST, PORT, this,
+                                "User", "isExistingUser", lsUsername);
+
+                        ((AsyncRetrieveObject) asyncUserExists).delegate = this;
+                        ((AsyncRetrieveObject) asyncUserExists).setProgressbar(prgBar);
+
+                        asyncUserExists.execute();
+
+                    }
                 }
-
                 return true;
 
             default:
@@ -284,6 +300,7 @@ public class NewPettyCashTransactionActivity extends AppCompatActivity implement
             AsyncTask<Void, Void, List<BEANPettyCashTransaction>> asyncNewPettyCashTransaction =
                     new AsyncNewPettyCashTransaction("PettyCash",
                             "createNewTransaction", lsPettyCash);
+            ((AsyncNewPettyCashTransaction) asyncNewPettyCashTransaction).delegate = this;
             asyncNewPettyCashTransaction.execute();
 
         }

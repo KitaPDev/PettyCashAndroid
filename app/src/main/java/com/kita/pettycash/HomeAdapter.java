@@ -26,7 +26,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
 
     HomeActivity m_homeActivity;
 
-    public HomeAdapter(Context p_context, List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
+    public HomeAdapter(Context p_context, List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions) {
         m_context = p_context;
         m_lsBEANPettyCashTransactions = p_lsBEANPettyCashTransactions;
         m_lsFilter = p_lsBEANPettyCashTransactions;
@@ -34,10 +34,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeHolder> implements Fil
         m_homeActivity = (HomeActivity) p_context;
     }
 
-    public void deleteFromDataSet(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions){
-        for (BEANPettyCashTransaction beanPettyCashTransaction : p_lsBEANPettyCashTransactions){
-            m_lsBEANPettyCashTransactions.remove(beanPettyCashTransaction);
-
+    public void deleteFromDataSet(List<BEANPettyCashTransaction> p_lsBEANPettyCashTransactions) {
+        for (BEANPettyCashTransaction beanPettyCashTransaction : p_lsBEANPettyCashTransactions) {
+            for(int index = 0; index < m_lsBEANPettyCashTransactions.size(); index++) {
+                if(m_lsBEANPettyCashTransactions.get(index).getPettyCashID() == beanPettyCashTransaction.getPettyCashID()) {
+                    m_lsBEANPettyCashTransactions.remove(index);
+                }
+            }
         }
         notifyDataSetChanged();
     }
